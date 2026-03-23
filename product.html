@@ -173,6 +173,38 @@
         white-space: pre-wrap;
       }
 
+      .specGrid {
+        margin-top: 12px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .specItem {
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: var(--chip);
+        padding: 10px 10px;
+      }
+
+      .specKey {
+        margin: 0;
+        font-size: 11.5px;
+        color: var(--muted);
+        font-weight: 800;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+      }
+
+      .specVal {
+        margin: 6px 0 0;
+        font-size: 14px;
+        font-weight: 750;
+        color: var(--text);
+        line-height: 1.2;
+        word-break: break-word;
+      }
+
       /* FPO Contact */
       .fpo {
         margin-top: 12px;
@@ -280,8 +312,8 @@
       <main id="app"></main>
     </div>
 
-    <script src="products.js" defer></script>
-    <script defer>
+    <script src="products.js"></script>
+    <script>
       (function () {
         const PLACEHOLDER_SVG =
           "data:image/svg+xml;charset=UTF-8," +
@@ -389,6 +421,31 @@
 
           info.appendChild(name);
           info.appendChild(topMeta);
+
+          // Specifications (no empty tiles)
+          const specGrid = document.createElement("div");
+          specGrid.className = "specGrid";
+
+          function addSpec(key, value) {
+            const v = text(value);
+            if (!v) return;
+            const item = document.createElement("div");
+            item.className = "specItem";
+            const k = document.createElement("p");
+            k.className = "specKey";
+            k.textContent = key;
+            const val = document.createElement("p");
+            val.className = "specVal";
+            val.textContent = v;
+            item.appendChild(k);
+            item.appendChild(val);
+            specGrid.appendChild(item);
+          }
+
+          addSpec("Product ID", p.id);
+          addSpec("Category", p.category);
+          addSpec("Pack", p.weight);
+          if (specGrid.children.length) info.appendChild(specGrid);
 
           // 3-5) Optional fields (no empty sections)
           const desc = makeBlock("Description", p.description);

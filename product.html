@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>Product Details — Global Centre of Excellence on Millets</title>
+
+    <style>
+      :root {
+        --bg: #fbf7ef;
+        --surface: #ffffff;
+        --text: #1f2a1f;
+        --muted: #556457;
+        --border: #e6ddcf;
+        --accent: #2f6b3c;
+        --accent-2: #a06a12;
+        --chip: #f2eadc;
+        --badge: #e9f4ea;
+
+        --radius-lg: 16px;
+        --radius-md: 12px;
+        --radius-sm: 10px;
+
+        --shadow: 0 2px 10px rgba(31, 42, 31, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial,
+          "Apple Color Emoji", "Segoe UI Emoji";
+        background: var(--bg);
+        color: var(--text);
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .wrap {
+        max-width: 780px;
+        margin: 0 auto;
+        padding: 14px 16px 28px;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 8px 0 14px;
+      }
+
+      .back {
+        min-height: 48px;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0 14px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: var(--chip);
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text);
+      }
+
+      .brand {
+        text-align: right;
+      }
+
+      .brandTitle {
+        margin: 0;
+        font-size: 13px;
+        color: var(--muted);
+        line-height: 1.2;
+      }
+
+      /* Product image */
+      .hero {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        background: linear-gradient(135deg, #efe5d6, #f7f2e8);
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow);
+      }
+
+      .hero img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      .card {
+        margin-top: 12px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow);
+        padding: 14px;
+      }
+
+      .name {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 800;
+        line-height: 1.25;
+      }
+
+      .topMeta {
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .weight {
+        color: var(--muted);
+        font-size: 13.5px;
+      }
+
+      .badge {
+        font-size: 12.5px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: var(--badge);
+        border: 1px solid color-mix(in srgb, var(--accent) 25%, white 75%);
+        color: var(--accent);
+        font-weight: 700;
+      }
+
+      @supports not (background: color-mix(in srgb, white 50%, black 50%)) {
+        .badge {
+          border: 1px solid #cfe3d2;
+        }
+      }
+
+      .block {
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid var(--border);
+      }
+
+      .blockTitle {
+        margin: 0 0 8px;
+        font-size: 13px;
+        color: var(--muted);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+      }
+
+      .blockText {
+        margin: 0;
+        line-height: 1.55;
+        color: var(--text);
+        font-size: 14.5px;
+        white-space: pre-wrap;
+      }
+
+      /* FPO Contact */
+      .fpo {
+        margin-top: 12px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow);
+        padding: 14px;
+      }
+
+      .fpoTitle {
+        margin: 0;
+        font-size: 14px;
+        color: var(--muted);
+        font-weight: 800;
+        letter-spacing: 0.2px;
+      }
+
+      .fpoName {
+        margin: 8px 0 2px;
+        font-size: 16px;
+        font-weight: 800;
+        line-height: 1.2;
+      }
+
+      .fpoLoc {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13.5px;
+        line-height: 1.3;
+      }
+
+      .actions {
+        margin-top: 12px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .btn {
+        min-height: 48px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 14.5px;
+        padding: 0 12px;
+        background: var(--chip);
+        color: var(--text);
+      }
+
+      .btnPrimary {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #ffffff;
+      }
+
+      .btnWhatsApp {
+        background: color-mix(in srgb, var(--accent) 14%, var(--chip) 86%);
+        border-color: color-mix(in srgb, var(--accent) 25%, var(--border) 75%);
+        color: var(--text);
+      }
+
+      @supports not (background: color-mix(in srgb, white 50%, black 50%)) {
+        .btnWhatsApp {
+          background: #e6f0e7;
+          border-color: #cfe3d2;
+        }
+      }
+
+      .error {
+        margin-top: 18px;
+        background: var(--surface);
+        border: 1px dashed var(--border);
+        border-radius: var(--radius-lg);
+        padding: 16px;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+
+      /* No animations (explicit) */
+      * {
+        scroll-behavior: auto;
+        transition: none !important;
+        animation: none !important;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="wrap">
+      <header>
+        <a class="back" href="index.html" aria-label="Back to homepage">
+          <span aria-hidden="true">←</span>
+          Back
+        </a>
+
+        <div class="brand" aria-hidden="true">
+          <p class="brandTitle">Global Centre of Excellence on Millets</p>
+        </div>
+      </header>
+
+      <main id="app"></main>
+    </div>
+
+    <script src="products.js" defer></script>
+    <script defer>
+      (function () {
+        const PLACEHOLDER_SVG =
+          "data:image/svg+xml;charset=UTF-8," +
+          encodeURIComponent(`
+            <svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800">
+              <defs>
+                <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#efe5d6"/>
+                  <stop offset="1" stop-color="#f7f2e8"/>
+                </linearGradient>
+              </defs>
+              <rect width="800" height="800" fill="url(#g)"/>
+              <rect x="120" y="150" width="560" height="420" rx="28" fill="#ffffff" opacity="0.7"/>
+              <path d="M210 495l120-130 95 105 95-110 170 195H210z" fill="#2f6b3c" opacity="0.55"/>
+              <circle cx="560" cy="290" r="44" fill="#a06a12" opacity="0.55"/>
+              <text x="400" y="640" font-family="system-ui,Segoe UI,Roboto,Arial" font-size="28" text-anchor="middle" fill="#556457">
+                Image not available
+              </text>
+            </svg>
+          `);
+
+        const app = document.getElementById("app");
+        const products = Array.isArray(window.PRODUCTS) ? window.PRODUCTS : [];
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get("id");
+
+        function text(v) {
+          return String(v || "").trim();
+        }
+
+        function digitsOnly(phone) {
+          return text(phone).replace(/\D/g, "");
+        }
+
+        function makeBlock(title, value) {
+          const v = text(value);
+          if (!v) return null;
+
+          const block = document.createElement("section");
+          block.className = "block";
+
+          const h = document.createElement("h2");
+          h.className = "blockTitle";
+          h.textContent = title;
+
+          const p = document.createElement("p");
+          p.className = "blockText";
+          p.textContent = v;
+
+          block.appendChild(h);
+          block.appendChild(p);
+          return block;
+        }
+
+        function renderNotFound() {
+          app.innerHTML = "";
+          const box = document.createElement("div");
+          box.className = "error";
+          box.innerHTML =
+            "<strong>Product not found.</strong><div style='margin-top:6px'>Please go back and choose a product again.</div>";
+          app.appendChild(box);
+        }
+
+        function renderProduct(p) {
+          document.title = `${p.name} — Product Details`;
+          app.innerHTML = "";
+
+          // 1) Image
+          const hero = document.createElement("div");
+          hero.className = "hero";
+
+          const img = document.createElement("img");
+          img.alt = p.name || "Product image";
+          img.loading = "eager";
+          img.decoding = "async";
+          img.src = p.image || PLACEHOLDER_SVG;
+          img.addEventListener("error", () => {
+            img.src = PLACEHOLDER_SVG;
+          });
+
+          hero.appendChild(img);
+          app.appendChild(hero);
+
+          // 2) Name, weight, badge
+          const info = document.createElement("div");
+          info.className = "card";
+
+          const name = document.createElement("h1");
+          name.className = "name";
+          name.textContent = p.name || "(Unnamed product)";
+
+          const topMeta = document.createElement("div");
+          topMeta.className = "topMeta";
+
+          const weight = document.createElement("div");
+          weight.className = "weight";
+          weight.textContent = p.weight ? `Pack: ${p.weight}` : "";
+
+          const badge = document.createElement("div");
+          badge.className = "badge";
+          badge.textContent = p.millet_type || "Millet";
+
+          topMeta.appendChild(weight);
+          topMeta.appendChild(badge);
+
+          info.appendChild(name);
+          info.appendChild(topMeta);
+
+          // 3-5) Optional fields (no empty sections)
+          const desc = makeBlock("Description", p.description);
+          if (desc) info.appendChild(desc);
+
+          const ing = makeBlock("Ingredients", p.ingredients);
+          if (ing) info.appendChild(ing);
+
+          const shelf = makeBlock("Shelf Life", p.shelf_life);
+          if (shelf) info.appendChild(shelf);
+
+          app.appendChild(info);
+
+          // 6) FPO Section (always)
+          const fpo = document.createElement("section");
+          fpo.className = "fpo";
+
+          const fpoTitle = document.createElement("p");
+          fpoTitle.className = "fpoTitle";
+          fpoTitle.textContent = "Contact the FPO";
+
+          const fpoName = document.createElement("p");
+          fpoName.className = "fpoName";
+          fpoName.textContent = text(p.fpo_name) || "FPO";
+
+          const fpoLoc = document.createElement("p");
+          fpoLoc.className = "fpoLoc";
+          fpoLoc.textContent = text(p.fpo_location);
+
+          const actions = document.createElement("div");
+          actions.className = "actions";
+
+          const call = document.createElement("a");
+          call.className = "btn btnPrimary";
+          call.textContent = "Call";
+          call.href = `tel:${text(p.contact)}`;
+
+          const wa = document.createElement("a");
+          wa.className = "btn btnWhatsApp";
+          wa.textContent = "WhatsApp";
+          const waNumber = digitsOnly(p.contact);
+          wa.href = waNumber
+            ? `https://wa.me/${waNumber}`
+            : "https://wa.me/";
+          wa.target = "_blank";
+          wa.rel = "noopener noreferrer";
+
+          actions.appendChild(call);
+          actions.appendChild(wa);
+
+          fpo.appendChild(fpoTitle);
+          fpo.appendChild(fpoName);
+          if (text(p.fpo_location)) fpo.appendChild(fpoLoc);
+          fpo.appendChild(actions);
+
+          app.appendChild(fpo);
+        }
+
+        const product = products.find((p) => String(p.id) === String(id));
+        if (!id || !product) {
+          renderNotFound();
+        } else {
+          renderProduct(product);
+        }
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>Global Centre of Excellence on Millets — Product Catalog</title>
+
+    <style>
+      :root {
+        /* Earthy / natural palette (greens + ambers + cream). */
+        --bg: #fbf7ef; /* cream */
+        --surface: #ffffff;
+        --text: #1f2a1f; /* deep green */
+        --muted: #556457; /* muted green */
+        --border: #e6ddcf;
+        --accent: #2f6b3c; /* leaf green */
+        --accent-2: #a06a12; /* amber */
+        --chip: #f2eadc;
+        --badge: #e9f4ea;
+        --danger: #a42424;
+
+        --radius-lg: 16px;
+        --radius-md: 12px;
+        --radius-sm: 10px;
+
+        --shadow: 0 2px 10px rgba(31, 42, 31, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial,
+          "Apple Color Emoji", "Segoe UI Emoji";
+        background: var(--bg);
+        color: var(--text);
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .wrap {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 16px;
+        padding-bottom: 28px;
+      }
+
+      header {
+        padding: 12px 0 8px;
+      }
+
+      .title {
+        margin: 0;
+        font-size: 18px;
+        line-height: 1.25;
+        letter-spacing: 0.2px;
+      }
+
+      .subtitle {
+        margin: 6px 0 0;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      /* Sticky search + filters */
+      .sticky {
+        position: sticky;
+        top: 0;
+        z-index: 5;
+        background: color-mix(in srgb, var(--bg) 90%, white 10%);
+        padding: 12px 0;
+        border-bottom: 1px solid var(--border);
+      }
+
+      @supports not (background: color-mix(in srgb, white 50%, black 50%)) {
+        .sticky {
+          background: var(--bg);
+        }
+      }
+
+      .searchRow {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .search {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow);
+        padding: 12px 12px;
+      }
+
+      .searchIcon {
+        width: 18px;
+        height: 18px;
+        opacity: 0.65;
+        flex: 0 0 auto;
+      }
+
+      .search input {
+        border: 0;
+        outline: none;
+        width: 100%;
+        font-size: 15px;
+        background: transparent;
+        color: var(--text);
+      }
+
+      .chips {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        padding: 4px 2px;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+
+      .chips::-webkit-scrollbar {
+        display: none;
+      }
+
+      .chip {
+        height: 48px;
+        padding: 0 14px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: var(--chip);
+        color: var(--text);
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        white-space: nowrap;
+        user-select: none;
+      }
+
+      .chip[aria-pressed="true"] {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: white;
+      }
+
+      .sectionLabel {
+        margin: 12px 0 0;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      /* Product grid */
+      .grid {
+        margin-top: 14px;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      @media (min-width: 720px) {
+        .wrap {
+          padding: 20px;
+        }
+        .title {
+          font-size: 20px;
+        }
+        .grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 14px;
+        }
+      }
+
+      @media (min-width: 980px) {
+        .grid {
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+      }
+
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        display: flex;
+        flex-direction: column;
+        min-height: 100%;
+      }
+
+      .cardMedia {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        background: linear-gradient(135deg, #efe5d6, #f7f2e8);
+      }
+
+      .cardMedia img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      .cardBody {
+        padding: 12px;
+        display: grid;
+        gap: 6px;
+      }
+
+      .name {
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 1.25;
+        margin: 0;
+      }
+
+      .meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .weight {
+        font-size: 12.5px;
+        color: var(--muted);
+      }
+
+      .badge {
+        font-size: 12px;
+        padding: 4px 8px;
+        border-radius: 999px;
+        background: var(--badge);
+        border: 1px solid color-mix(in srgb, var(--accent) 25%, white 75%);
+        color: var(--accent);
+        font-weight: 600;
+      }
+
+      @supports not (background: color-mix(in srgb, white 50%, black 50%)) {
+        .badge {
+          border: 1px solid #cfe3d2;
+        }
+      }
+
+      .empty {
+        margin: 18px 0 0;
+        background: var(--surface);
+        border: 1px dashed var(--border);
+        border-radius: var(--radius-lg);
+        padding: 18px;
+        color: var(--muted);
+        line-height: 1.45;
+      }
+
+      .srOnly {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      /* No animations (explicit) */
+      * {
+        scroll-behavior: auto;
+        transition: none !important;
+        animation: none !important;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="wrap">
+      <header>
+        <h1 class="title">Global Centre of Excellence on Millets</h1>
+        <p class="subtitle">ICMR • Product display catalog (QR access)</p>
+      </header>
+
+      <div class="sticky" role="region" aria-label="Search and filters">
+        <div class="searchRow">
+          <label class="search" for="searchInput">
+            <svg
+              class="searchIcon"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z"
+                stroke="currentColor"
+                stroke-width="2"
+              />
+              <path
+                d="M16.5 16.5 21 21"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+            </svg>
+            <span class="srOnly">Search</span>
+            <input
+              id="searchInput"
+              type="search"
+              inputmode="search"
+              autocomplete="off"
+              placeholder="Search by product name or millet type (e.g., Ragi)"
+            />
+          </label>
+
+          <div>
+            <div class="sectionLabel">Category</div>
+            <div id="chips" class="chips" aria-label="Category filters"></div>
+          </div>
+        </div>
+      </div>
+
+      <main>
+        <div id="grid" class="grid" aria-label="Product grid"></div>
+        <div id="empty" class="empty" hidden>
+          <strong>No products found.</strong>
+          <div style="margin-top: 6px">
+            Try a different search term or change the category.
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="products.js" defer></script>
+    <script defer>
+      (function () {
+        const PLACEHOLDER_SVG =
+          "data:image/svg+xml;charset=UTF-8," +
+          encodeURIComponent(`
+            <svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800">
+              <defs>
+                <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#efe5d6"/>
+                  <stop offset="1" stop-color="#f7f2e8"/>
+                </linearGradient>
+              </defs>
+              <rect width="800" height="800" fill="url(#g)"/>
+              <rect x="120" y="150" width="560" height="420" rx="28" fill="#ffffff" opacity="0.7"/>
+              <path d="M210 495l120-130 95 105 95-110 170 195H210z" fill="#2f6b3c" opacity="0.55"/>
+              <circle cx="560" cy="290" r="44" fill="#a06a12" opacity="0.55"/>
+              <text x="400" y="640" font-family="system-ui,Segoe UI,Roboto,Arial" font-size="28" text-anchor="middle" fill="#556457">
+                Image not available
+              </text>
+            </svg>
+          `);
+
+        const products = Array.isArray(window.PRODUCTS) ? window.PRODUCTS : [];
+
+        const els = {
+          chips: document.getElementById("chips"),
+          searchInput: document.getElementById("searchInput"),
+          grid: document.getElementById("grid"),
+          empty: document.getElementById("empty"),
+        };
+
+        let activeCategory = "All";
+        let searchTerm = "";
+
+        function normalize(v) {
+          return String(v || "").trim().toLowerCase();
+        }
+
+        function uniqueCategories(items) {
+          const set = new Set(items.map((p) => String(p.category || "").trim()));
+          set.delete("");
+          return ["All", ...Array.from(set).sort((a, b) => a.localeCompare(b))];
+        }
+
+        function buildChips() {
+          const categories = uniqueCategories(products);
+          els.chips.innerHTML = "";
+
+          for (const cat of categories) {
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "chip";
+            btn.textContent = cat;
+            btn.setAttribute("aria-pressed", String(cat === activeCategory));
+            btn.addEventListener("click", () => {
+              activeCategory = cat;
+              for (const child of els.chips.children) {
+                child.setAttribute(
+                  "aria-pressed",
+                  String(child.textContent === activeCategory)
+                );
+              }
+              render();
+            });
+            els.chips.appendChild(btn);
+          }
+        }
+
+        function matchesSearch(p) {
+          if (!searchTerm) return true;
+          const n = normalize(p.name);
+          const m = normalize(p.millet_type);
+          return n.includes(searchTerm) || m.includes(searchTerm);
+        }
+
+        function matchesCategory(p) {
+          if (activeCategory === "All") return true;
+          return String(p.category || "").trim() === activeCategory;
+        }
+
+        function productCard(p) {
+          const a = document.createElement("a");
+          a.className = "card";
+          a.href = `product.html?id=${encodeURIComponent(p.id)}`;
+          a.setAttribute("aria-label", `${p.name} details`);
+
+          const media = document.createElement("div");
+          media.className = "cardMedia";
+
+          const img = document.createElement("img");
+          img.alt = p.name;
+          img.loading = "lazy";
+          img.decoding = "async";
+          img.src = p.image || PLACEHOLDER_SVG;
+          img.addEventListener("error", () => {
+            img.src = PLACEHOLDER_SVG;
+          });
+          media.appendChild(img);
+
+          const body = document.createElement("div");
+          body.className = "cardBody";
+
+          const name = document.createElement("p");
+          name.className = "name";
+          name.textContent = p.name || "(Unnamed product)";
+
+          const meta = document.createElement("div");
+          meta.className = "meta";
+
+          const weight = document.createElement("div");
+          weight.className = "weight";
+          weight.textContent = p.weight || "";
+
+          const badge = document.createElement("div");
+          badge.className = "badge";
+          badge.textContent = p.millet_type || "Millet";
+
+          meta.appendChild(weight);
+          meta.appendChild(badge);
+
+          body.appendChild(name);
+          body.appendChild(meta);
+
+          a.appendChild(media);
+          a.appendChild(body);
+
+          return a;
+        }
+
+        function render() {
+          const filtered = products.filter((p) => matchesCategory(p) && matchesSearch(p));
+
+          els.grid.innerHTML = "";
+          for (const p of filtered) {
+            els.grid.appendChild(productCard(p));
+          }
+
+          els.empty.hidden = filtered.length !== 0;
+        }
+
+        function initEvents() {
+          els.searchInput.addEventListener("input", (e) => {
+            searchTerm = normalize(e.target.value);
+            render();
+          });
+        }
+
+        buildChips();
+        initEvents();
+        render();
+      })();
+    </script>
+  </body>
+</html>

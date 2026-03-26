@@ -89,19 +89,25 @@
       /* Product image */
       .hero {
         width: 100%;
-        aspect-ratio: 1 / 1;
+        /* Uniform product canvas */
+        aspect-ratio: 4 / 5;
         border-radius: var(--radius-lg);
         overflow: hidden;
-        background: linear-gradient(135deg, #efe5d6, #f7f2e8);
+        background: #ffffff;
         border: 1px solid var(--border);
         box-shadow: var(--shadow);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px;
       }
 
       .hero img {
         width: 100%;
         height: 100%;
-        object-fit: cover;
+        object-fit: contain;
         display: block;
+        background: #ffffff;
       }
 
       .card {
@@ -213,6 +219,33 @@
         border-radius: var(--radius-lg);
         box-shadow: var(--shadow);
         padding: 14px;
+      }
+
+      .interest {
+        margin-top: 12px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow);
+        padding: 14px;
+      }
+
+      .interestTitle {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 900;
+        line-height: 1.2;
+      }
+
+      .interestSub {
+        margin: 6px 0 0;
+        color: var(--muted);
+        font-size: 13.5px;
+        line-height: 1.35;
+      }
+
+      .btnDisabled {
+        opacity: 0.6;
       }
 
       .fpoTitle {
@@ -458,6 +491,42 @@
           if (shelf) info.appendChild(shelf);
 
           app.appendChild(info);
+
+          // Interested CTA (always shown; link is set in products.js)
+          const interest = document.createElement("section");
+          interest.className = "interest";
+
+          const interestTitle = document.createElement("p");
+          interestTitle.className = "interestTitle";
+          interestTitle.textContent = "Interested? Get in touch with us!";
+
+          const interestSub = document.createElement("p");
+          interestSub.className = "interestSub";
+          interestSub.textContent =
+            "Share your interest via a quick form — we’ll reach out.";
+
+          const interestBtn = document.createElement("a");
+          interestBtn.className = "btn btnPrimary";
+          interestBtn.textContent = "Click here";
+
+          const interestUrl = String(window.INTEREST_FORM_URL || "").trim();
+          if (interestUrl) {
+            interestBtn.href = interestUrl;
+            interestBtn.target = "_blank";
+            interestBtn.rel = "noopener noreferrer";
+          } else {
+            interestBtn.href = "#";
+            interestBtn.classList.add("btnDisabled");
+            interestBtn.setAttribute("aria-disabled", "true");
+            interestBtn.addEventListener("click", (e) => e.preventDefault());
+          }
+
+          interest.appendChild(interestTitle);
+          interest.appendChild(interestSub);
+          interest.appendChild(document.createElement("div"));
+          interest.lastChild.style.marginTop = "12px";
+          interest.lastChild.appendChild(interestBtn);
+          app.appendChild(interest);
 
           // 6) FPO Section (always)
           const fpo = document.createElement("section");

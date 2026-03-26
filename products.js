@@ -9,6 +9,9 @@
 */
 
 // Expose as a global for simple vanilla JS usage.
+// Paste your Google Form link here later (example: "https://forms.gle/...")
+window.INTEREST_FORM_URL = "";
+
 window.PRODUCTS = [
   {
     id: "001",

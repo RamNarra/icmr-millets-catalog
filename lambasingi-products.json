@@ -48,22 +48,6 @@
     "source_url": "https://lambasingifpo.com/products/black-pepper"
   },
   {
-    "id": "chicken-masala",
-    "name": "Oops! Page Not Found.",
-    "image": "product-images/lambasingi/chicken-masala.jpg",
-    "weight": "",
-    "category": "Millets",
-    "millet_type": "Millets",
-    "fpo_name": "Lambasingi Tribal Products FPC Ltd",
-    "fpo_location": "Chintapalli Mandal, ASR District, Andhra Pradesh",
-    "contact": "",
-    "description": "",
-    "ingredients": "",
-    "shelf_life": "",
-    "sku": "",
-    "source_url": "https://lambasingifpo.com/products/chicken-masala"
-  },
-  {
     "id": "flax-seeds-chilli-powder",
     "name": "Flax Seeds Chilli Powder",
     "image": "product-images/lambasingi/flax-seeds-chilli-powder.jpg",
@@ -174,22 +158,6 @@
     "shelf_life": "",
     "sku": "120",
     "source_url": "https://lambasingifpo.com/products/herbal-shampoo"
-  },
-  {
-    "id": "honey-500grms",
-    "name": "Oops! Page Not Found.",
-    "image": "product-images/lambasingi/honey-500grms.jpg",
-    "weight": "",
-    "category": "Millets",
-    "millet_type": "Millets",
-    "fpo_name": "Lambasingi Tribal Products FPC Ltd",
-    "fpo_location": "Chintapalli Mandal, ASR District, Andhra Pradesh",
-    "contact": "",
-    "description": "",
-    "ingredients": "",
-    "shelf_life": "",
-    "sku": "",
-    "source_url": "https://lambasingifpo.com/products/honey-500grms"
   },
   {
     "id": "jack-fruit-pickle-250-grams",
@@ -352,22 +320,6 @@
     "source_url": "https://lambasingifpo.com/products/pandu-mirchi-pickle-250-grams"
   },
   {
-    "id": "papaya-soap",
-    "name": "Oops! Page Not Found.",
-    "image": "product-images/lambasingi/papaya-soap.jpg",
-    "weight": "",
-    "category": "Millets",
-    "millet_type": "Millets",
-    "fpo_name": "Lambasingi Tribal Products FPC Ltd",
-    "fpo_location": "Chintapalli Mandal, ASR District, Andhra Pradesh",
-    "contact": "",
-    "description": "",
-    "ingredients": "",
-    "shelf_life": "",
-    "sku": "",
-    "source_url": "https://lambasingifpo.com/products/papaya-soap"
-  },
-  {
     "id": "pepper-powder",
     "name": "Pepper powder 50 grams",
     "image": "product-images/lambasingi/pepper-powder.jpg",
@@ -510,21 +462,5 @@
     "shelf_life": "",
     "sku": "120",
     "source_url": "https://lambasingifpo.com/products/turmeric-120-grms"
-  },
-  {
-    "id": "turmeric-soap",
-    "name": "Oops! Page Not Found.",
-    "image": "product-images/lambasingi/turmeric-soap.jpg",
-    "weight": "",
-    "category": "Millets",
-    "millet_type": "Millets",
-    "fpo_name": "Lambasingi Tribal Products FPC Ltd",
-    "fpo_location": "Chintapalli Mandal, ASR District, Andhra Pradesh",
-    "contact": "",
-    "description": "",
-    "ingredients": "",
-    "shelf_life": "",
-    "sku": "",
-    "source_url": "https://lambasingifpo.com/products/turmeric-soap"
   }
 ]

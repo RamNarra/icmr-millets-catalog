@@ -447,6 +447,19 @@ function extractTitle(html) {
   return "";
 }
 
+function isNotFoundProductPage(html) {
+  const h = String(html || "");
+  const title = normalizeSpace((h.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] || "").replace(/<[^>]*>/g, ""));
+  const h1 = normalizeSpace((h.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i)?.[1] || "").replace(/<[^>]*>/g, ""));
+
+  const combined = `${title} ${h1}`.toLowerCase();
+  if (combined.includes("oops! page not found")) return true;
+  if (combined.includes("404") && combined.includes("lambasingifpo")) return true;
+  if (combined.includes("page not found")) return true;
+
+  return false;
+}
+
 function slugToId(slug) {
   // Deterministic id from slug (safe for URL params)
   return slug
@@ -556,6 +569,7 @@ async function main() {
   const repoRoot = path.resolve(process.cwd());
   const out = [];
   let imagesDownloaded = 0;
+  let skippedNotFound = 0;
 
   // Ensure image output dir exists
   try {
@@ -573,6 +587,12 @@ async function main() {
       html = await fetchText(url);
     } catch (e) {
       console.warn(`Skip (fetch failed): ${url}`);
+      continue;
+    }
+
+    if (isNotFoundProductPage(html)) {
+      skippedNotFound++;
+      console.warn(`Skip (not found page): ${url}`);
       continue;
     }
 
@@ -622,6 +642,34 @@ async function main() {
   const outPath = path.join(repoRoot, "lambasingi-products.json");
   fs.writeFileSync(outPath, JSON.stringify(out, null, 2), "utf8");
 
+  // Prune orphaned downloaded images so the repo stays clean.
+  try {
+    const localPrefix = `${LOCAL_IMAGE_DIR.replace(/\\/g, "/")}/`;
+    const keep = new Set(
+      out
+        .map((p) => String(p.image || ""))
+        .filter((img) => img.startsWith(localPrefix))
+        .map((img) => img.slice(localPrefix.length))
+    );
+
+    const absDir = path.join(repoRoot, LOCAL_IMAGE_DIR);
+    if (fs.existsSync(absDir)) {
+      const files = fs.readdirSync(absDir);
+      for (const f of files) {
+        const abs = path.join(absDir, f);
+        try {
+          if (fs.statSync(abs).isFile() && !keep.has(f)) {
+            fs.unlinkSync(abs);
+          }
+        } catch {
+          // ignore
+        }
+      }
+    }
+  } catch {
+    // ignore
+  }
+
   // Also generate products.js for the static site.
   const productsJsPath = path.join(repoRoot, "products.js");
   let preservedInterestUrl = "";
@@ -646,6 +694,7 @@ async function main() {
 
   console.log(`\nWrote ${out.length} products to: ${outPath}`);
   console.log(`Downloaded ${imagesDownloaded} images into: ${LOCAL_IMAGE_DIR}`);
+  if (skippedNotFound) console.log(`Skipped ${skippedNotFound} not-found pages`);
   console.log(`Wrote products.js to: ${productsJsPath}`);
   console.log(
     "Next: review the JSON, then merge into products.js (and add contact numbers)."

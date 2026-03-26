@@ -23,8 +23,9 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const BASE = "https://www.lambasingifpo.com";
+const BASE = "https://lambasingifpo.com";
 const SITEMAP_INDEX_URL = `${BASE}/sitemap.xml`;
+const LOCAL_IMAGE_DIR = path.join("product-images", "lambasingi");
 
 function normalizeSpace(s) {
   return String(s || "").replace(/\s+/g, " ").trim();
@@ -51,6 +52,176 @@ function extractXmlLocs(xmlText) {
 function extractSitemapProductUrlsFromSitemapXml(xmlText) {
   const urls = extractXmlLocs(xmlText);
   return urls.filter((u) => u.includes("/products/"));
+}
+
+function normalizeUrl(u) {
+  if (!u) return "";
+  try {
+    const url = new URL(u);
+    url.hash = "";
+    url.search = "";
+    // Normalize trailing slash (except root)
+    if (url.pathname.length > 1) url.pathname = url.pathname.replace(/\/+$/, "");
+    return url.toString();
+  } catch {
+    return String(u).split("#")[0].split("?")[0].replace(/\/+$/, "");
+  }
+}
+
+function isProductDetailUrl(u) {
+  try {
+    const url = new URL(u);
+    if (url.hostname !== new URL(BASE).hostname) return false;
+    const p = url.pathname.replace(/\/+$/, "");
+    if (!p.startsWith("/products/")) return false;
+    const slug = p.slice("/products/".length);
+    return Boolean(slug);
+  } catch {
+    return false;
+  }
+}
+
+function isProductListingUrl(u) {
+  try {
+    const url = new URL(u);
+    if (url.hostname !== new URL(BASE).hostname) return false;
+
+    const p = url.pathname.replace(/\/+$/, "");
+    if (p === "/products") return true;
+    if (/^\/categories\/[^/]+\/products$/i.test(p)) return true;
+    if (/^\/tags\/[^/]+\/products$/i.test(p)) return true;
+    if (/^\/brands\/[^/]+\/products$/i.test(p)) return true;
+    return false;
+  } catch {
+    return false;
+  }
+}
+
+function extractHrefs(html) {
+  const out = [];
+  const re = /\bhref\s*=\s*(["'])([^"']+)\1/gi;
+  let m;
+  while ((m = re.exec(String(html || "")))) {
+    const raw = (m[2] || "").trim();
+    if (!raw) continue;
+    if (raw.startsWith("javascript:")) continue;
+    if (raw.startsWith("mailto:")) continue;
+    if (raw.startsWith("tel:")) continue;
+    out.push(raw);
+  }
+  return out;
+}
+
+async function discoverAllProductUrls() {
+  const productUrls = new Set();
+  const listingSeen = new Set();
+  const listingQueue = [];
+
+  // 0) Preferred: /products returns JSON for XHR requests, including all product slugs.
+  // This is the most reliable enumeration because the HTML is an SPA shell.
+  let xhrProductCount = 0;
+  try {
+    const addPayload = (payload) => {
+      const rows = payload?.products?.data || [];
+      for (const row of rows) {
+        const slug = normalizeSpace(row?.slug);
+        if (!slug) continue;
+        const u = normalizeUrl(`${BASE}/products/${slug}`);
+        if (u && !productUrls.has(u)) {
+          productUrls.add(u);
+          xhrProductCount++;
+        }
+      }
+    };
+
+    const first = await fetchJsonAsXhr(`${BASE}/products?limit=50&page=1`);
+    addPayload(first);
+    const lastPage = Number(first?.products?.last_page || 1);
+    for (let page = 2; page <= lastPage; page++) {
+      const next = await fetchJsonAsXhr(`${BASE}/products?limit=50&page=${page}`);
+      addPayload(next);
+      await sleep(80);
+    }
+  } catch (e) {
+    console.warn(`XHR products index discovery failed: ${String(e?.message || e)}`);
+  }
+
+  // 1) Sitemap-based discovery (may be incomplete)
+  let sitemapProductCount = 0;
+  try {
+    const indexXml = await fetchText(SITEMAP_INDEX_URL);
+    const sitemapUrls = extractXmlLocs(indexXml).filter((u) => /sitemap_products_/i.test(u));
+    for (const smUrl of sitemapUrls) {
+      const xml = await fetchText(smUrl);
+      for (const u of extractSitemapProductUrlsFromSitemapXml(xml)) {
+        const nu = normalizeUrl(u);
+        if (nu && !productUrls.has(nu)) {
+          productUrls.add(nu);
+          sitemapProductCount++;
+        }
+      }
+    }
+  } catch (e) {
+    console.warn(`Sitemap discovery failed: ${String(e?.message || e)}`);
+  }
+
+  // 2) Crawl listing pages and extract /products/<slug> links
+  // Seed with shop + sitemap categories/brands (these pages tend to expose all products).
+  listingQueue.push(`${BASE}/`);
+  listingQueue.push(`${BASE}/products`);
+
+  try {
+    const catXml = await fetchText(`${BASE}/sitemaps/sitemap_categories_1.xml`);
+    const cats = extractXmlLocs(catXml);
+    for (const c of cats) listingQueue.push(normalizeUrl(c) || c);
+  } catch {
+    // ignore
+  }
+
+  try {
+    const brandXml = await fetchText(`${BASE}/sitemaps/sitemap_brands_1.xml`);
+    const brands = extractXmlLocs(brandXml);
+    for (const b of brands) listingQueue.push(normalizeUrl(b) || b);
+  } catch {
+    // ignore
+  }
+
+  const MAX_LISTING_PAGES = 250;
+  while (listingQueue.length && listingSeen.size < MAX_LISTING_PAGES) {
+    const url = listingQueue.shift();
+    if (!url) continue;
+    if (listingSeen.has(url)) continue;
+    listingSeen.add(url);
+
+    let html = "";
+    try {
+      html = await fetchText(url);
+    } catch {
+      continue;
+    }
+
+    const hrefs = extractHrefs(html);
+    for (const href of hrefs) {
+      const abs = absoluteUrl(href);
+      if (!abs) continue;
+
+      if (isProductDetailUrl(abs)) {
+        productUrls.add(normalizeUrl(abs));
+        continue;
+      }
+
+      if (isProductListingUrl(abs) && !listingSeen.has(abs)) {
+        listingQueue.push(abs);
+      }
+    }
+  }
+
+  console.log(`XHR products: ${xhrProductCount}`);
+  console.log(`Sitemap products: ${sitemapProductCount}`);
+  console.log(`Listing pages crawled: ${listingSeen.size}`);
+  console.log(`Total unique product URLs discovered: ${productUrls.size}`);
+
+  return productUrls;
 }
 
 function decodeJsonEscapes(s) {
@@ -301,28 +472,98 @@ async function fetchText(url) {
   return await res.text();
 }
 
+async function fetchJsonAsXhr(url) {
+  const res = await fetch(url, {
+    headers: {
+      "user-agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+      accept: "application/json",
+      "x-requested-with": "XMLHttpRequest",
+      "accept-language": "en-IN,en;q=0.9",
+    },
+  });
+  if (!res.ok) {
+    throw new Error(`${res.status} ${res.statusText} for ${url}`);
+  }
+  return await res.json();
+}
+
+async function fetchBinary(url) {
+  const res = await fetch(url, {
+    headers: {
+      "user-agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+      accept: "image/avif,image/webp,image/apng,image/*,*/*;q=0.8",
+      "accept-language": "en-IN,en;q=0.9",
+    },
+  });
+  if (!res.ok) {
+    throw new Error(`${res.status} ${res.statusText} for ${url}`);
+  }
+  const buf = Buffer.from(await res.arrayBuffer());
+  return buf;
+}
+
+function guessImageExtFromUrl(url) {
+  try {
+    const u = new URL(url);
+    const base = u.pathname.split("/").pop() || "";
+    const m = base.match(/\.(jpg|jpeg|png|webp)$/i);
+    if (m) return `.${m[1].toLowerCase()}`;
+  } catch {
+    // ignore
+  }
+  return ".jpg";
+}
+
+async function downloadProductImage({ imageUrl, slug, repoRoot }) {
+  if (!imageUrl) return { localPath: "", downloaded: false };
+
+  const ext = guessImageExtFromUrl(imageUrl);
+  const relPath = path.join(LOCAL_IMAGE_DIR, `${slugToId(slug)}${ext}`);
+  const absPath = path.join(repoRoot, relPath);
+
+  try {
+    if (fs.existsSync(absPath) && fs.statSync(absPath).size > 0) {
+      return { localPath: relPath.replace(/\\/g, "/"), downloaded: false };
+    }
+
+    fs.mkdirSync(path.dirname(absPath), { recursive: true });
+    const bin = await fetchBinary(imageUrl);
+    fs.writeFileSync(absPath, bin);
+    return { localPath: relPath.replace(/\\/g, "/"), downloaded: true };
+  } catch (e) {
+    console.warn(`Image download failed, using remote URL: ${imageUrl}`);
+    return { localPath: "", downloaded: false };
+  }
+}
+
 async function sleep(ms) {
   await new Promise((r) => setTimeout(r, ms));
 }
 
 async function main() {
-  // Category listing pages are a JS shell; use sitemap for reliable discovery.
-  const indexXml = await fetchText(SITEMAP_INDEX_URL);
-  const sitemapUrls = extractXmlLocs(indexXml).filter((u) => /sitemap_products_/i.test(u));
-  if (!sitemapUrls.length) {
-    throw new Error(`No product sitemaps found in ${SITEMAP_INDEX_URL}`);
+  const productUrls = await discoverAllProductUrls();
+  if (!productUrls.size) {
+    throw new Error("No product URLs discovered; cannot continue.");
   }
 
-  const productUrls = new Set();
-  for (const smUrl of sitemapUrls) {
-    const xml = await fetchText(smUrl);
-    for (const u of extractSitemapProductUrlsFromSitemapXml(xml)) productUrls.add(u);
-  }
+  const queue = Array.from(productUrls)
+    .sort()
+    .map((url) => ({ url, category: "Imported" }));
+  console.log(`Processing ${queue.length} product pages...`);
 
-  const queue = Array.from(productUrls).map((url) => ({ url, category: "Imported" }));
-  console.log(`Found ${queue.length} product URLs via sitemap`);
-
+  const repoRoot = path.resolve(process.cwd());
   const out = [];
+  let imagesDownloaded = 0;
+
+  // Ensure image output dir exists
+  try {
+    fs.mkdirSync(path.join(repoRoot, LOCAL_IMAGE_DIR), { recursive: true });
+  } catch {
+    // ignore
+  }
+
   for (let i = 0; i < queue.length; i++) {
     const { url, category } = queue[i];
     const slug = url.split("/products/")[1]?.split(/[?#]/)[0] || url;
@@ -345,10 +586,19 @@ async function main() {
     const weight = guessWeightFromName(name);
     const milletType = guessMilletType(name, [category, ...categories]);
 
+    // Download image locally so the static site doesn't hotlink.
+    const { localPath, downloaded } = await downloadProductImage({
+      imageUrl: image,
+      slug,
+      repoRoot,
+    });
+    if (downloaded) imagesDownloaded++;
+    const imagePath = localPath || image;
+
     out.push({
       id: slugToId(slug),
       name,
-      image,
+      image: imagePath,
       weight,
       category: categories[0] || category,
       millet_type: milletType,
@@ -369,7 +619,6 @@ async function main() {
     await sleep(150);
   }
 
-  const repoRoot = path.resolve(process.cwd());
   const outPath = path.join(repoRoot, "lambasingi-products.json");
   fs.writeFileSync(outPath, JSON.stringify(out, null, 2), "utf8");
 
@@ -396,6 +645,7 @@ async function main() {
   );
 
   console.log(`\nWrote ${out.length} products to: ${outPath}`);
+  console.log(`Downloaded ${imagesDownloaded} images into: ${LOCAL_IMAGE_DIR}`);
   console.log(`Wrote products.js to: ${productsJsPath}`);
   console.log(
     "Next: review the JSON, then merge into products.js (and add contact numbers)."

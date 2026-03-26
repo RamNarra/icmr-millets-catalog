@@ -550,7 +550,8 @@
           const call = document.createElement("a");
           call.className = "btn btnPrimary";
           call.textContent = "Call";
-          call.href = `tel:${text(p.contact)}`;
+          const contactText = text(p.contact);
+          call.href = contactText ? `tel:${contactText}` : "#";
 
           const wa = document.createElement("a");
           wa.className = "btn btnWhatsApp";
@@ -558,9 +559,18 @@
           const waNumber = digitsOnly(p.contact);
           wa.href = waNumber
             ? `https://wa.me/${waNumber}`
-            : "https://wa.me/";
+            : "#";
           wa.target = "_blank";
           wa.rel = "noopener noreferrer";
+
+          if (!contactText && !waNumber) {
+            call.classList.add("btnDisabled");
+            wa.classList.add("btnDisabled");
+            call.setAttribute("aria-disabled", "true");
+            wa.setAttribute("aria-disabled", "true");
+            call.addEventListener("click", (e) => e.preventDefault());
+            wa.addEventListener("click", (e) => e.preventDefault());
+          }
 
           actions.appendChild(call);
           actions.appendChild(wa);
